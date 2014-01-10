@@ -104,6 +104,7 @@ int main(int argc, char **argv)
    unsigned int opt_flash_sector_all       = 0;
    unsigned int opt_flash_sector_from      = 0;
    unsigned int opt_flash_sector_to        = 0;
+   unsigned int opt_no_sync                = 0;
 
    unsigned long read_addr=0;
    unsigned long read_size=32;
@@ -119,7 +120,7 @@ int main(int argc, char **argv)
    mem.cclk                = DEFAULT_DEVICE_CCLK;
    
    /* parse command line */
-   while( ( c = getopt(argc, argv, "l:b:f:c:o:hvieAR:F:T:B:a:s:") ) != -1 ) {
+   while( ( c = getopt(argc, argv, "l:b:f:c:o:hvieAnR:F:T:B:a:s:") ) != -1 ) {
       switch(c) {
          
          case 'l': /* line - cu/tty device file */
@@ -185,6 +186,10 @@ int main(int argc, char **argv)
          case 'e': /* erase flash rom and exit */
             opt_lpcflash_cmd = LPC_ERASE;
             break;
+
+	 case 'n': /* disable sync */
+	    opt_no_sync = 1;
+	    break;
          
          case 'h': /* help */
          default:
@@ -207,7 +212,8 @@ int main(int argc, char **argv)
    if(serial_fd<0) 
       return(1);
 
-   serial_synchronize(serial_fd, mem.cclk);
+   if(!opt_no_sync)
+      serial_synchronize(serial_fd, mem.cclk);
    serial_cmd_read_partid(serial_fd, &mem.cpu.id);
    serial_cmd_read_bootcode_version(serial_fd, &mem.cpu.bootcode);
    serial_cmd_read_device_serialno(serial_fd, mem.cpu.serial);
@@ -608,6 +614,7 @@ static void lpcflash_help(void)
    puts("\t -a                  (ram/rom memory address in hex)");
    puts("\t -s                  (only for -a: size in hex - word aligned)");
    puts("\t[-v]                 (be verbose)");
+   puts("\t[-n]                 (do not sync device. Only use if already synced)");
    puts("\t[-h]                 ( _o/ )");
    puts("\t[-i]                 (dump cpu infos)");
    puts("\t[-e]                 (erase only (== erase and exit))");
