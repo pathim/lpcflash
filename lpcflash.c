@@ -359,7 +359,7 @@ static int lpcflash_image_write(int serial_fd, mem_info_t *mem, char *imgpath)
             mem->img_total_size  = mem->img_sector_last * 0x1000;
 			printf("D1: mem->img_sector_last = %x\nD1: mem->img_total_size = %x\n", mem->img_sector_last, mem->img_total_size);
          } else {
-            mem->img_sector_last = 0x0f + ((bin_stat.st_size - 0x10000) + (0x8000 - ((bin_stat.st_size - 0x10000) % 0x8000))) / 0x8000;
+            mem->img_sector_last = 0x0f + ((bin_stat.st_size - 0x10000) + (0x8000 - ((bin_stat.st_size - 0x10000) % 0x8000))) / 0x8000-1;
             mem->img_total_size  = mem->img_sector_last * 0x8000;
 			printf("D2: mem->img_sector_last = %x\nD2: mem->img_total_size = %x\n", mem->img_sector_last, mem->img_total_size);
          }
